@@ -6,6 +6,17 @@ Dependency-free JavaScript ESM. Requires Git 2.28+ and Node 24.8+; use the lates
 
 ## Try it
 
+Install the published npm release:
+
+```sh
+npm install -g @hexmillionaire/repo-fixtures@0.1.0
+repo-fixtures list
+repo-fixtures create conflict ./my-conflict --json
+git -C ./my-conflict/repo status
+```
+
+Or run directly from a checkout:
+
 ```sh
 git clone https://github.com/hexmillionaire/repo-fixtures.git
 cd repo-fixtures
