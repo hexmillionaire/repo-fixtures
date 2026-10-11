@@ -1,0 +1,16 @@
+name: Scenario proposal
+description: Propose a small real Git edge case
+body:
+  - type: textarea
+    id: failure
+    attributes:
+      label: Developer-tool failure this reproduces
+    validations:
+      required: true
+  - type: textarea
+    id: facts
+    attributes:
+      label: Expected observable Git facts and smallest setup
+      description: Explain why an existing scenario or git-scenarios is insufficient.
+    validations:
+      required: true
