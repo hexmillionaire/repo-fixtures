@@ -15,6 +15,12 @@ repo-fixtures create conflict ./my-conflict --json
 git -C ./my-conflict/repo status
 ```
 
+Or run it once without installing:
+
+```sh
+npx -y @hexmillionaire/repo-fixtures@0.1.0 create conflict ./my-conflict --json
+```
+
 Or run directly from a checkout:
 
 ```sh

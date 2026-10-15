@@ -1,0 +1,18 @@
+# Repo Fixtures
+
+> Zero-dependency CLI and ESM library (`@hexmillionaire/repo-fixtures`, Node 24.8+, Git 2.28+) that creates a small real Git repository in a new directory for one named scenario, plus a `fixture.json` with expected and observed Git state. Use it to reproduce a developer-tool bug on a known Git state instead of sharing a private repository.
+
+Quick use:
+
+- `npx -y @hexmillionaire/repo-fixtures@0.1.0 list` lists scenarios: `clean`, `dirty`, `staged`, `rename`, `conflict`, `unusual-paths`, `submodule`.
+- `repo-fixtures create <scenario> <new-directory> [--json]` creates `<new-directory>/repo` (the Git repo), `fixture.json` and `CREATED.txt`. The destination must not exist; its parent must exist.
+- Exit codes: 0 success; 2 invalid input or creation error. A failed run leaves `INCOMPLETE.txt` and is never cleaned up automatically.
+- Library: `import { createFixture, listScenarios } from '@hexmillionaire/repo-fixtures'`; `await createFixture('conflict', dir, { signal })` returns `{ directory, repository, manifest }`.
+- Git runs with argument arrays, inherited `GIT_*` variables removed, global/system config ignored, hooks disabled, signing off, and a fixed author, committer and date.
+- `fixture.json` has `expectations` and `observations` (porcelain v1 `status`, `conflicts`, `submodules`, `head`, `branch`, `gitVersion`). Commit hashes are stable across destinations on the same Git version.
+
+## Docs
+
+- [README](https://github.com/hexmillionaire/repo-fixtures/blob/main/README.md): scenarios, manifest format, limits
+- [Scope audit example](https://github.com/hexmillionaire/repo-fixtures/blob/main/docs/AGENT-LANES.md)
+- [Security](https://github.com/hexmillionaire/repo-fixtures/blob/main/SECURITY.md)
