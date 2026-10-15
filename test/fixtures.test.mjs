@@ -96,3 +96,22 @@ test('a failed final marker write retains an incomplete bundle and never marks i
   assert.deepEqual(manifest.observations.status, [{ index: 'M', worktree: 'M', path: 'src/app.txt' }]);
   assert.equal(execFileSync('git', ['-C', path.join(destination, 'repo'), 'show', ':src/app.txt'], { encoding: 'utf8', windowsHide: true }), 'staged change\n');
 });
+
+test('committed history does not depend on the destination path', async t => {
+  const root = await parent(t);
+  await mkdir(path.join(root, 'one')); await mkdir(path.join(root, 'two', 'deeper path'), { recursive: true });
+  for (const { id } of listScenarios()) {
+    const first = await createFixture(id, path.join(root, 'one', id));
+    const second = await createFixture(id, path.join(root, 'two', 'deeper path', id));
+    assert.equal(first.manifest.observations.head, second.manifest.observations.head, id);
+  }
+  const gitmodules = await readFile(path.join(root, 'one', 'submodule', 'repo', '.gitmodules'), 'utf8');
+  assert.match(gitmodules, /url = \.\.\/upstream/); assert.ok(!gitmodules.includes(root));
+  const status = execFileSync('git', ['-C', path.join(root, 'two', 'deeper path', 'submodule', 'repo'), 'submodule', 'status'], { encoding: 'utf8', windowsHide: true });
+  assert.match(status, /^ [a-f0-9]{40} modules\/child/);
+});
+test('a missing parent directory is reported plainly and nothing is created', async t => {
+  const root = await parent(t);
+  await assert.rejects(createFixture('clean', path.join(root, 'missing', 'fixture')), /parent directory must already exist/);
+  await assert.rejects(access(path.join(root, 'missing')));
+});

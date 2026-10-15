@@ -15,6 +15,12 @@ repo-fixtures create conflict ./my-conflict --json
 git -C ./my-conflict/repo status
 ```
 
+Or run it once without installing:
+
+```sh
+npx -y @hexmillionaire/repo-fixtures@0.1.0 create conflict ./my-conflict --json
+```
+
 Or run directly from a checkout:
 
 ```sh
@@ -62,7 +68,7 @@ console.log(result.repository, result.manifest.expectations);
 
 ## Limits and alternatives
 
-This is a compact bug-report bundle generator. It is not a model benchmark, security sandbox, proof of test correctness, repository capture tool or a configurable scenario DSL. A completed fixture should still be verified by the consuming tool. Git author dates and SHA-1 object format are fixed; byte-for-byte bundles are not promised across Git versions and platforms. Keep the submodule bundle at its original location because its generated local URL refers to the sibling upstream directory.
+This is a compact bug-report bundle generator. It is not a model benchmark, security sandbox, proof of test correctness, repository capture tool or a configurable scenario DSL. A completed fixture should still be verified by the consuming tool. Git author dates and SHA-1 object format are fixed; byte-for-byte bundles are not promised across Git versions and platforms. The submodule scenario commits the relative URL `../upstream`, so its commits are identical wherever the bundle is created; keep `repo/` and `upstream/` together, and run `git submodule sync` if you move the bundle and need to fetch the submodule again.
 
 [git-scenarios](https://git-scenarios.griffen.codes/) already provides a rich composable DSL, many more scenarios, mocks, runner adapters and a CLI. Choose it for custom histories and broad test-suite integration. Repo Fixtures offers seven intentionally small scenarios, no runtime dependencies, a separate expected/observed JSON manifest and no tool launching or cleanup feature. Both can help agents and humans reproduce Git behavior; neither verifies an agent's claims.
 

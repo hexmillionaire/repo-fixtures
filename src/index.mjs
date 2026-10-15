@@ -71,7 +71,11 @@ export async function createFixture(scenario, destination, { signal } = {}) {
   signal?.throwIfAborted();
   const target = path.resolve(destination);
   // Resolve the parent so junctions/symlinks do not change what directory we own.
-  const parent = await realpath(path.dirname(target));
+  let parent;
+  try { parent = await realpath(path.dirname(target)); } catch (error) {
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw new Error('The destination\'s parent directory must already exist.');
+    throw error;
+  }
   const bundle = path.join(parent, path.basename(target));
   try { await mkdir(bundle); } catch (error) { if (error.code === 'EEXIST') throw new Error('Destination already exists; choose a new directory.'); throw error; }
   // Failure intentionally leaves a clearly marked partial bundle; no recursive deletion.
@@ -107,7 +111,10 @@ export async function createFixture(scenario, destination, { signal } = {}) {
   } else if (scenario === 'submodule') {
     const upstream = path.join(bundle, 'upstream'); await init(bundle, upstream, signal);
     await file(upstream, 'child.txt', 'local submodule\n'); await commit(bundle, upstream, 'Child baseline', signal);
-    await git(bundle, repository, ['-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', '--', upstream, 'modules/child'], { signal });
+    // A relative URL keeps the destination's absolute path out of the committed
+    // .gitmodules, so HEAD is the same wherever the bundle is created or moved.
+    // Without a remote, Git resolves it against the superproject's worktree.
+    await git(bundle, repository, ['-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', '--', '../upstream', 'modules/child'], { signal });
     await commit(bundle, repository, 'Add local submodule', signal);
   }
   const observations = await observe(bundle, repository, signal);
@@ -117,7 +124,7 @@ export async function createFixture(scenario, destination, { signal } = {}) {
   }
   const manifest = { version: 1, generator: { name: '@hexmillionaire/repo-fixtures', version: VERSION }, scenario, repository: 'repo', base,
     expectations: expected, observations,
-    limits: ['Synthetic Git state; not a model evaluation or test-correctness claim.', 'Git hashes are SHA-1 and timestamps fixed; byte-for-byte bundles are not promised across Git versions/platforms.', 'The submodule scenario refers to its sibling upstream directory; keep the complete bundle together.'] };
+    limits: ['Synthetic Git state; not a model evaluation or test-correctness claim.', 'Git hashes are SHA-1 and timestamps fixed; byte-for-byte bundles are not promised across Git versions/platforms.', 'The submodule scenario refers to its sibling upstream directory by the relative URL ../upstream; keep the complete bundle together.'] };
   await writeFile(path.join(bundle, 'fixture.json'), `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });
   await writeFile(path.join(bundle, 'INCOMPLETE.txt'), 'Repo Fixtures finished. Read fixture.json; the disposable Git repository is in repo/. No consumer tools were executed.\n');
   await rename(path.join(bundle, 'INCOMPLETE.txt'), path.join(bundle, 'CREATED.txt'));

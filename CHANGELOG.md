@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fixed: the `submodule` scenario commits the relative URL `../upstream`, so its HEAD no longer depends on (or records) the absolute destination path.
+- A missing destination parent directory now produces a plain error message.
+- Docs: `npx` usage and an `llms.txt` summary for agents. Package metadata: homepage, bugs URL and keywords.
+
 ## 0.1.0
 
 - Seven real Git scenarios for portable reproduction bundles.
