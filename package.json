@@ -1,15 +1,17 @@
 {
   "name": "@hexmillionaire/repo-fixtures",
   "version": "0.1.0",
-  "description": "Inspectable real Git fixtures for reproducible bug reports and developer tool tests.",
+  "description": "Create small real Git repos (staged changes, renames, merge conflicts, Unicode paths, submodules) for reproducible bug reports and dev-tool tests. Zero dependencies.",
   "type": "module",
   "bin": { "repo-fixtures": "bin/repo-fixtures.mjs" },
   "exports": { ".": "./src/index.mjs" },
-  "files": ["src", "bin", "README.md", "LICENSE", "docs", "CHANGELOG.md", "SECURITY.md"],
+  "files": ["src", "bin", "README.md", "llms.txt", "LICENSE", "docs", "CHANGELOG.md", "SECURITY.md"],
   "scripts": { "test": "node --test", "test:package": "node scripts/package-smoke.mjs" },
   "engines": { "node": ">=24.8.0" },
   "repository": { "type": "git", "url": "https://github.com/hexmillionaire/repo-fixtures.git" },
+  "homepage": "https://github.com/hexmillionaire/repo-fixtures#readme",
+  "bugs": { "url": "https://github.com/hexmillionaire/repo-fixtures/issues" },
   "license": "MIT",
-  "keywords": ["git", "fixtures", "testing", "reproduction", "codex", "claude-code"],
+  "keywords": ["git", "fixtures", "git-fixtures", "test-fixtures", "testing", "reproduction", "bug-report", "merge-conflict", "submodule", "git-status", "cli", "codex", "claude-code"],
   "publishConfig": { "access": "public" }
 }
