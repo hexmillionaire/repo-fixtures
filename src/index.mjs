@@ -3,7 +3,7 @@ import { promisify } from 'node:util';
 import { mkdir, writeFile, rename, realpath } from 'node:fs/promises';
 import path from 'node:path';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.1.1';
 const execute = promisify(execFile);
 const catalogue = [
   ['clean', 'One committed file and a clean worktree.'],

@@ -1,6 +1,6 @@
 {
   "name": "@hexmillionaire/repo-fixtures",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create small real Git repos (staged changes, renames, merge conflicts, Unicode paths, submodules) for reproducible bug reports and dev-tool tests. Zero dependencies.",
   "type": "module",
   "bin": { "repo-fixtures": "bin/repo-fixtures.mjs" },

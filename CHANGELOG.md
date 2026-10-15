@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1
 
 - Fixed: the `submodule` scenario commits the relative URL `../upstream`, so its HEAD no longer depends on (or records) the absolute destination path.
 - A missing destination parent directory now produces a plain error message.

@@ -9,7 +9,7 @@ Dependency-free JavaScript ESM. Requires Git 2.28+ and Node 24.8+; use the lates
 Install the published npm release:
 
 ```sh
-npm install -g @hexmillionaire/repo-fixtures@0.1.0
+npm install -g @hexmillionaire/repo-fixtures@0.1.1
 repo-fixtures list
 repo-fixtures create conflict ./my-conflict --json
 git -C ./my-conflict/repo status
@@ -18,7 +18,7 @@ git -C ./my-conflict/repo status
 Or run it once without installing:
 
 ```sh
-npx -y @hexmillionaire/repo-fixtures@0.1.0 create conflict ./my-conflict --json
+npx -y @hexmillionaire/repo-fixtures@0.1.1 create conflict ./my-conflict --json
 ```
 
 Or run directly from a checkout:
@@ -36,7 +36,7 @@ The destination must **not exist**, and its parent must exist. Quote paths with 
 GitHub release archives are independently installable:
 
 ```sh
-npm install -g https://github.com/hexmillionaire/repo-fixtures/releases/download/v0.1.0/hexmillionaire-repo-fixtures-0.1.0.tgz
+npm install -g https://github.com/hexmillionaire/repo-fixtures/releases/download/v0.1.1/hexmillionaire-repo-fixtures-0.1.1.tgz
 repo-fixtures create staged ./my-staged-fixture --json
 ```
 
