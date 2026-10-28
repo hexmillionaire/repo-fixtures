@@ -4,7 +4,7 @@
 
 Quick use:
 
-- `npx -y @hexmillionaire/repo-fixtures@0.1.1 list` lists scenarios: `clean`, `dirty`, `staged`, `rename`, `conflict`, `unusual-paths`, `submodule`.
+- `npx -y @hexmillionaire/repo-fixtures@0.2.0 list` lists scenarios: `clean`, `dirty`, `staged`, `rename`, `conflict`, `unusual-paths`, `submodule`, `linked-worktree`.
 - `repo-fixtures create <scenario> <new-directory> [--json]` creates `<new-directory>/repo` (the Git repo), `fixture.json` and `CREATED.txt`. The destination must not exist; its parent must exist.
 - Exit codes: 0 success; 2 invalid input or creation error. A failed run leaves `INCOMPLETE.txt` and is never cleaned up automatically.
 - Library: `import { createFixture, listScenarios } from '@hexmillionaire/repo-fixtures'`; `await createFixture('conflict', dir, { signal })` returns `{ directory, repository, manifest }`.

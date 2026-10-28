@@ -1,15 +1,15 @@
 # Repo Fixtures
 
-Create a small, inspectable real Git repository when a developer tool breaks on staged changes, renames, conflicts, Unicode paths or submodules. Share the scenario command and `fixture.json` instead of a private working repository.
+Create a small, inspectable real Git repository when a developer tool breaks on staged changes, renames, conflicts, Unicode paths, submodules or linked worktrees. Share the scenario command and `fixture.json` instead of a private working repository.
 
-Dependency-free JavaScript ESM. Requires Git 2.28+ and Node 24.8+; use the latest Node 24 LTS patch. No model API key, network connection or agent client is needed to create a fixture after installation.
+Dependency-free JavaScript ESM. Requires Git 2.28+ and Node 24.8+. Use a current patched Node 26 LTS or Node 24 LTS runtime; CI tests both lines and the 24.8 minimum. No model API key, network connection or agent client is needed to create a fixture after installation.
 
 ## Try it
 
 Install the published npm release:
 
 ```sh
-npm install -g @hexmillionaire/repo-fixtures@0.1.1
+npm install -g @hexmillionaire/repo-fixtures@0.2.0
 repo-fixtures list
 repo-fixtures create conflict ./my-conflict --json
 git -C ./my-conflict/repo status
@@ -18,7 +18,7 @@ git -C ./my-conflict/repo status
 Or run it once without installing:
 
 ```sh
-npx -y @hexmillionaire/repo-fixtures@0.1.1 create conflict ./my-conflict --json
+npx -y @hexmillionaire/repo-fixtures@0.2.0 create conflict ./my-conflict --json
 ```
 
 Or run directly from a checkout:
@@ -36,7 +36,7 @@ The destination must **not exist**, and its parent must exist. Quote paths with 
 GitHub release archives are independently installable:
 
 ```sh
-npm install -g https://github.com/hexmillionaire/repo-fixtures/releases/download/v0.1.1/hexmillionaire-repo-fixtures-0.1.1.tgz
+npm install -g https://github.com/hexmillionaire/repo-fixtures/releases/download/v0.2.0/hexmillionaire-repo-fixtures-0.2.0.tgz
 repo-fixtures create staged ./my-staged-fixture --json
 ```
 
@@ -51,10 +51,13 @@ repo-fixtures create staged ./my-staged-fixture --json
 | `conflict` | Unresolved merge and three-stage index entries |
 | `unusual-paths` | Modified and untracked Unicode paths with spaces |
 | `submodule` | Committed gitlink pointing to a locally created sibling upstream |
+| `linked-worktree` | Clean branch `fixture/worktree` in `repo/`, with a `.git` file pointing to a sibling primary repository in `upstream/` |
 
 `fixture.json` version 1 contains the generator version, scenario, relative repository path, initial base commit, independently specified expectations and observed Git status/conflicts/submodules. The CLI's JSON result also includes absolute output paths for local use. Review a report before posting it if those paths are private.
 
 Index/worktree status characters are Git porcelain v1 values. Renames include `from`. The initial `base` is intentionally before scenario changes; `observations.head` records the final HEAD. Submodule paths are recorded even when the top-level status is clean. See [a connected scope-audit example](docs/AGENT-LANES.md).
+
+The linked-worktree scenario adds a `layout` record identifying its primary repository and branch. Its two worktrees share Git objects but have separate indexes and checked-out files. Git stores absolute administrative paths for linked worktrees: keep the bundle at its original location, or deliberately repair both locations with `git worktree repair` (Git 2.30+) after moving it. With older Git, recreate the fixture instead. This scenario is useful for checking tools that incorrectly assume `.git` is always a directory.
 
 ## Library
 
@@ -70,10 +73,10 @@ console.log(result.repository, result.manifest.expectations);
 
 This is a compact bug-report bundle generator. It is not a model benchmark, security sandbox, proof of test correctness, repository capture tool or a configurable scenario DSL. A completed fixture should still be verified by the consuming tool. Git author dates and SHA-1 object format are fixed; byte-for-byte bundles are not promised across Git versions and platforms. The submodule scenario commits the relative URL `../upstream`, so its commits are identical wherever the bundle is created; keep `repo/` and `upstream/` together, and run `git submodule sync` if you move the bundle and need to fetch the submodule again.
 
-[git-scenarios](https://git-scenarios.griffen.codes/) already provides a rich composable DSL, many more scenarios, mocks, runner adapters and a CLI. Choose it for custom histories and broad test-suite integration. Repo Fixtures offers seven intentionally small scenarios, no runtime dependencies, a separate expected/observed JSON manifest and no tool launching or cleanup feature. Both can help agents and humans reproduce Git behavior; neither verifies an agent's claims.
+[git-scenarios](https://git-scenarios.griffen.codes/) already provides a rich composable DSL, many more scenarios, mocks, runner adapters and a CLI. Choose it for custom histories and broad test-suite integration. Repo Fixtures offers eight intentionally small scenarios, no runtime dependencies, a separate expected/observed JSON manifest and no tool launching or cleanup feature. Both can help agents and humans reproduce Git behavior; neither verifies an agent's claims.
 
 ## Contribute
 
-Run `npm test` and `npm run test:package`. CI runs real Git fixtures on Linux, Windows and macOS plus minimum Node 24.8. Start with [CONTRIBUTING.md](CONTRIBUTING.md): useful contributions include a minimized failing fixture, portable Git observations, clearer diagnostics and documentation. Include Git/Node/OS versions and fictional data in reports.
+Run `npm test` and `npm run test:package`. CI runs real Git fixtures on Linux, Windows and macOS on Node 24 and 26, plus minimum Node 24.8. Start with [CONTRIBUTING.md](CONTRIBUTING.md): useful contributions include a minimized failing fixture, portable Git observations, clearer diagnostics and documentation. Include Git/Node/OS versions and fictional data in reports.
 
 Related: [Agent Lanes](https://github.com/hexmillionaire/Agent-Lanes), [Agent Desk](https://github.com/hexmillionaire/agent-desk), [Agent Lanes MCP](https://github.com/hexmillionaire/agent-lanes-mcp), [MCP Surface](https://github.com/hexmillionaire/mcp-surface).
