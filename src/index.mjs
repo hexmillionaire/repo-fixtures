@@ -3,7 +3,7 @@ import { promisify } from 'node:util';
 import { mkdir, writeFile, rename, realpath } from 'node:fs/promises';
 import path from 'node:path';
 
-export const VERSION = '0.1.1';
+export const VERSION = '0.2.0';
 const execute = promisify(execFile);
 const catalogue = [
   ['clean', 'One committed file and a clean worktree.'],
@@ -13,6 +13,7 @@ const catalogue = [
   ['conflict', 'Two branches edit the same line; a real unresolved merge.'],
   ['unusual-paths', 'Unicode and space-containing tracked and untracked paths.'],
   ['submodule', 'A locally created Git submodule, without network access.'],
+  ['linked-worktree', 'A clean linked Git worktree with a .git file and sibling primary repository.'],
 ];
 export function listScenarios() { return catalogue.map(([id, description]) => ({ id, description })); }
 
@@ -83,10 +84,14 @@ export async function createFixture(scenario, destination, { signal } = {}) {
   await writeFile(path.join(bundle, 'empty.gitconfig'), '', { flag: 'wx' });
   await mkdir(path.join(bundle, 'empty-hooks'));
   const repository = path.join(bundle, 'repo');
-  await init(bundle, repository, signal);
-  await file(repository, '.gitignore', 'ignored/\n.agent-lanes/\n');
-  await file(repository, 'src/app.txt', 'baseline\n');
-  await commit(bundle, repository, 'Fixture baseline', signal);
+  const primary = scenario === 'linked-worktree' ? path.join(bundle, 'upstream') : repository;
+  await init(bundle, primary, signal);
+  await file(primary, '.gitignore', 'ignored/\n.agent-lanes/\n');
+  await file(primary, 'src/app.txt', 'baseline\n');
+  await commit(bundle, primary, 'Fixture baseline', signal);
+  if (scenario === 'linked-worktree') {
+    await git(bundle, primary, ['worktree', 'add', '-q', '-b', 'fixture/worktree', '--', repository, 'main'], { signal });
+  }
   const base = (await git(bundle, repository, ['rev-parse', 'HEAD'], { signal })).trim();
   if (scenario === 'dirty') {
     await writeFile(path.join(repository, 'src/app.txt'), 'unstaged change\n');
@@ -123,8 +128,10 @@ export async function createFixture(scenario, destination, { signal } = {}) {
     if (JSON.stringify(observations[key]) !== JSON.stringify(expected[key])) throw new Error(`Generated ${scenario} fixture does not match expected ${key}; inspect the marked partial bundle.`);
   }
   const manifest = { version: 1, generator: { name: '@hexmillionaire/repo-fixtures', version: VERSION }, scenario, repository: 'repo', base,
+    ...(scenario === 'linked-worktree' ? { layout: { kind: 'linked-worktree', primaryRepository: 'upstream', branch: 'fixture/worktree' } } : {}),
     expectations: expected, observations,
-    limits: ['Synthetic Git state; not a model evaluation or test-correctness claim.', 'Git hashes are SHA-1 and timestamps fixed; byte-for-byte bundles are not promised across Git versions/platforms.', 'The submodule scenario refers to its sibling upstream directory by the relative URL ../upstream; keep the complete bundle together.'] };
+    limits: ['Synthetic Git state; not a model evaluation or test-correctness claim.', 'Git hashes are SHA-1 and timestamps fixed; byte-for-byte bundles are not promised across Git versions/platforms.', 'The submodule scenario refers to its sibling upstream directory by the relative URL ../upstream; keep the complete bundle together.',
+      ...(scenario === 'linked-worktree' ? ['Linked worktrees use Git-managed absolute administrative paths. Keep the bundle at its original location; use git worktree repair (Git 2.30+) after deliberately moving it; recreate it instead on older Git.'] : [])] };
   await writeFile(path.join(bundle, 'fixture.json'), `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });
   await writeFile(path.join(bundle, 'INCOMPLETE.txt'), 'Repo Fixtures finished. Read fixture.json; the disposable Git repository is in repo/. No consumer tools were executed.\n');
   await rename(path.join(bundle, 'INCOMPLETE.txt'), path.join(bundle, 'CREATED.txt'));
@@ -138,7 +145,7 @@ function expectations(scenario) {
     rename: [{ index: 'R', worktree: ' ', path: 'src/renamed file.txt', from: 'src/app.txt' }],
     conflict: [{ index: 'U', worktree: 'U', path: 'src/app.txt' }],
     'unusual-paths': [{ index: ' ', worktree: 'M', path: 'src/café 文件.txt' }, { index: '?', worktree: '?', path: 'untracked space 文件.txt' }],
-    submodule: [],
+    submodule: [], 'linked-worktree': [],
   };
   return { status: records[scenario], conflicts: scenario === 'conflict' ? ['src/app.txt'] : [], submodules: scenario === 'submodule' ? ['modules/child'] : [] };
 }

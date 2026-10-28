@@ -16,7 +16,7 @@ for (const { id } of listScenarios()) test(`${id}: real Git state matches indepe
   const root = await parent(t); const result = await createFixture(id, path.join(root, 'fixture with spaces'));
   const { observations, expectations } = result.manifest;
   assert.deepEqual(observations.status, expectations.status); assert.deepEqual(observations.conflicts, expectations.conflicts); assert.deepEqual(observations.submodules, expectations.submodules);
-  assert.equal(observations.branch, 'main'); assert.match(result.manifest.base, /^[a-f0-9]{40}$/);
+  assert.equal(observations.branch, id === 'linked-worktree' ? 'fixture/worktree' : 'main'); assert.match(result.manifest.base, /^[a-f0-9]{40}$/);
   assert.deepEqual(JSON.parse(await readFile(path.join(result.directory, 'fixture.json'), 'utf8')), result.manifest);
   await assert.rejects(access(path.join(result.directory, 'INCOMPLETE.txt')));
   if (id === 'staged') {
@@ -39,7 +39,7 @@ test('pre-aborted creation leaves no directory and competing creators never over
 });
 test('CLI JSON workflow and usage errors', async t => {
   const root = await parent(t); const bin = fileURLToPath(new URL('../bin/repo-fixtures.mjs', import.meta.url));
-  const listing = spawnSync(process.execPath, [bin, 'list', '--json'], { encoding: 'utf8', windowsHide: true }); assert.equal(listing.status, 0); assert.equal(JSON.parse(listing.stdout).scenarios.length, 7);
+  const listing = spawnSync(process.execPath, [bin, 'list', '--json'], { encoding: 'utf8', windowsHide: true }); assert.equal(listing.status, 0); assert.equal(JSON.parse(listing.stdout).scenarios.length, 8);
   const created = spawnSync(process.execPath, [bin, 'create', 'dirty', path.join(root, 'cli'), '--json'], { encoding: 'utf8', windowsHide: true }); assert.equal(created.status, 0, created.stderr); assert.equal(JSON.parse(created.stdout).manifest.scenario, 'dirty');
   const invalid = spawnSync(process.execPath, [bin, 'create', 'dirty'], { encoding: 'utf8', windowsHide: true }); assert.equal(invalid.status, 2);
 });
