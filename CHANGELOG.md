@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Releases publish from `.github/workflows/publish.yml` on a version tag, using npm trusted publishing (OIDC, no stored token) with a provenance attestation.
+
 ## 0.2.0
 
 - Add a real `linked-worktree` scenario with a `.git` file, shared objects and separate index/worktree state, plus manifest layout information and movement limits.
